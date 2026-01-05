@@ -1,0 +1,135 @@
+.user-profile-container {
+  background: white;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.profile-header {
+  padding: 1.5rem 2rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  transition: all 0.3s ease;
+}
+
+.profile-header:hover {
+  background: linear-gradient(135deg, #e0e7ee 0%, #b8c6db 100%);
+}
+
+.profile-header h2 {
+  color: #185a9d;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.profile-subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.expand-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: #43cea2;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.expand-button:hover {
+  background: #185a9d;
+  transform: translateY(-2px);
+}
+
+.profile-content {
+  padding: 2rem;
+}
+
+.preference-section {
+  margin-bottom: 2rem;
+}
+
+.preference-section:last-child {
+  margin-bottom: 0;
+}
+
+.preference-section h3 {
+  color: #185a9d;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #43cea2;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.option-card {
+  background: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.option-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(67, 206, 162, 0.3);
+  border-color: #43cea2;
+}
+
+.option-card.selected {
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+  border-color: #43cea2;
+  color: white;
+}
+
+.option-icon {
+  font-size: 2rem;
+}
+
+.option-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.option-card.selected .option-label {
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .options-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .option-card {
+    padding: 0.8rem;
+  }
+
+  .option-icon {
+    font-size: 1.5rem;
+  }
+
+  .option-label {
+    font-size: 0.85rem;
+  }
+
+  .profile-content {
+    padding: 1.5rem;
+  }
+}
