@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './App.css';
 import ImageUpload from './components/ImageUpload';
 import UserProfile from './components/UserProfile';
 import IngredientInsights from './components/IngredientInsights';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 function App() {
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [userPreferences, setUserPreferences] = useState({
     dietaryRestrictions: [],
     healthGoals: [],
@@ -13,124 +17,124 @@ function App() {
   });
   const [analysis, setAnalysis] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [sessionId] = useState(() => {
+    // Generate or retrieve session ID
+    let id = localStorage.getItem('foodsense_session_id');
+    if (!id) {
+      id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('foodsense_session_id', id);
+    }
+    return id;
+  });
 
-  const handleImageUpload = (imageData) => {
+  const handleImageUpload = (imageData, file) => {
     setUploadedImage(imageData);
+    setImageFile(file);
     setAnalysis(null);
   };
 
   const handlePreferencesChange = (preferences) => {
     setUserPreferences(preferences);
+    // Save preferences to backend
+    saveUserPreferences(preferences);
+  };
+
+  const saveUserPreferences = async (preferences) => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/user/preferences`, {
+        session_id: sessionId,
+        health_concerns: preferences.concerns || [],
+        dietary_restrictions: preferences.dietaryRestrictions || [],
+        allergens: preferences.healthGoals || [],
+        preferences: {}
+      });
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+    }
   };
 
   const analyzeIngredients = async () => {
-    if (!uploadedImage) {
+    if (!uploadedImage || !imageFile) {
       alert('Please upload a food label image first');
       return;
     }
 
     setIsAnalyzing(true);
 
-    // Simulate AI analysis (in production, this would call OCR + AI API)
-    setTimeout(() => {
-      const result = performIngredientAnalysis(userPreferences);
+    try {
+      // Create form data
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('session_id', sessionId);
+
+      // Call backend API
+      const response = await axios.post(
+        `${API_BASE_URL}/api/analysis/analyze`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Transform backend response to match frontend format
+      const result = transformAnalysisResponse(response.data);
       setAnalysis(result);
+    } catch (error) {
+      console.error('Analysis error:', error);
+      alert(error.response?.data?.detail || 'An error occurred during analysis. Please try again.');
+    } finally {
       setIsAnalyzing(false);
-    }, 2500);
+    }
   };
 
-  const performIngredientAnalysis = (preferences) => {
-    // Simulated ingredient extraction and analysis
-    const mockIngredients = [
-      'Enriched Wheat Flour',
-      'High Fructose Corn Syrup',
-      'Partially Hydrogenated Soybean Oil',
-      'Modified Corn Starch',
-      'Sodium Benzoate (Preservative)',
-      'Natural and Artificial Flavors',
-      'Yellow 5',
-      'Red 40',
-      'BHT (Butylated Hydroxytoluene)'
-    ];
-
-    const insights = {
-      overallScore: 4.5,
-      maxScore: 10,
-      ingredients: mockIngredients,
-      concerns: [
-        {
-          level: 'high',
-          ingredient: 'Partially Hydrogenated Soybean Oil',
-          reason: 'Contains trans fats',
-          explanation: 'Trans fats are linked to increased risk of heart disease and should be avoided. The FDA has determined that partially hydrogenated oils are not safe for consumption.',
-          confidence: 'high'
-        },
-        {
-          level: 'medium',
-          ingredient: 'High Fructose Corn Syrup',
-          reason: 'Added sugar',
-          explanation: 'High fructose corn syrup is a processed sweetener linked to obesity, diabetes, and metabolic issues when consumed in excess. Consider limiting daily intake.',
-          confidence: 'high'
-        },
-        {
-          level: 'medium',
-          ingredient: 'Yellow 5 & Red 40',
-          reason: 'Artificial food coloring',
-          explanation: 'Some studies suggest artificial dyes may cause hyperactivity in sensitive children. While FDA-approved, their necessity is debated.',
-          confidence: 'medium'
-        },
-        {
-          level: 'low',
-          ingredient: 'Modified Corn Starch',
-          reason: 'Highly processed',
-          explanation: 'Modified starches are chemically altered for texture. Generally recognized as safe but offer minimal nutritional value.',
-          confidence: 'medium'
-        }
-      ],
-      positives: [
-        {
-          ingredient: 'Enriched Wheat Flour',
-          benefit: 'Fortified with B vitamins and iron',
-          note: 'While enriched, whole grain alternatives provide more fiber and nutrients'
-        }
-      ],
-      alternatives: [
-        'Look for products with whole grain flour listed first',
-        'Choose items without hydrogenated oils',
-        'Seek natural sweeteners like honey or maple syrup',
-        'Opt for products with no artificial colors'
-      ],
-      uncertainties: [
-        '"Natural Flavors" is a broad term that can include 100+ compounds - specific composition not disclosed',
-        'Long-term effects of consuming multiple additives together are not fully understood',
-        'Individual sensitivity varies - what works for others may not work for you'
-      ],
-      personalizedNotes: generatePersonalizedNotes(preferences)
+  const transformAnalysisResponse = (data) => {
+    // Transform backend response to match frontend format
+    const ratingMap = {
+      'excellent': 9,
+      'good': 7,
+      'moderate': 5,
+      'poor': 3,
+      'harmful': 1
     };
 
-    return insights;
-  };
+    const overallScore = ratingMap[data.overall_rating] || 5;
 
-  const generatePersonalizedNotes = (preferences) => {
-    const notes = [];
-    
-    if (preferences.dietaryRestrictions.includes('vegan')) {
-      notes.push('⚠️ This product may contain animal-derived ingredients in "Natural Flavors"');
-    }
-    
-    if (preferences.healthGoals.includes('weight-loss')) {
-      notes.push('❗ High fructose corn syrup may hinder weight loss goals');
-    }
-    
-    if (preferences.healthGoals.includes('heart-health')) {
-      notes.push('🚫 Trans fats are particularly harmful for cardiovascular health');
-    }
-    
-    if (preferences.concerns.includes('children')) {
-      notes.push('⚠️ Artificial colors have been linked to hyperactivity in some children');
-    }
+    // Convert ingredients to concerns format
+    const concerns = [];
+    const positives = [];
 
-    return notes;
+    data.ingredients.forEach(ing => {
+      if (ing.safety_rating === 'concerning' || ing.safety_rating === 'harmful') {
+        concerns.push({
+          level: ing.safety_rating === 'harmful' ? 'high' : 'medium',
+          ingredient: ing.name,
+          reason: ing.category || 'Unknown',
+          explanation: ing.description || 'No detailed information available',
+          confidence: ing.confidence > 0.8 ? 'high' : 'medium'
+        });
+      } else if (ing.safety_rating === 'safe' && ing.health_effects.length > 0) {
+        positives.push({
+          ingredient: ing.name,
+          benefit: ing.health_effects.join(', '),
+          note: ing.description || ''
+        });
+      }
+    });
+
+    return {
+      overallScore: overallScore,
+      maxScore: 10,
+      ingredients: data.ingredients.map(i => i.name),
+      concerns: concerns,
+      positives: positives,
+      alternatives: data.recommendations || [],
+      uncertainties: [],
+      personalizedNotes: data.warnings || [],
+      extractedText: data.extracted_text,
+      confidenceScore: data.confidence_score
+    };
   };
 
   const resetAnalysis = () => {

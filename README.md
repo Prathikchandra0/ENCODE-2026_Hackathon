@@ -1,6 +1,6 @@
 # FoodSense AI - Ingredient Intelligence Co-Pilot
 
-An AI-native web application that reimagines how consumers understand food product ingredients. Built with React, this intelligent co-pilot translates complex ingredient lists into clear, human-level insights while honestly communicating uncertainty.
+An AI-powered web application that translates complex food ingredients into clear, actionable insights. Built with **React frontend** and **FastAPI backend** using **EasyOCR** for text extraction and **Groq LLM** for intelligent analysis.
 
 ## 🎯 Problem Statement
 
@@ -15,34 +15,99 @@ Food labels are optimized for regulatory compliance, not human understanding. Co
 ## 💡 Solution
 
 FoodSense AI provides an intelligent co-pilot that:
-- ✅ Interprets ingredient information on your behalf
-- ✅ Translates scientific/regulatory context into plain language
-- ✅ Communicates uncertainty honestly and intuitively
-- ✅ Minimizes cognitive load with clear, actionable insights
-- ✅ Personalizes recommendations based on dietary needs and health goals
+- ✅ **Real OCR**: Extracts text from food label images using EasyOCR
+- ✅ **AI Analysis**: Uses Groq's LLaMA models to analyze ingredients
+- ✅ **Database**: Stores analysis history and user preferences
+- ✅ **Personalized**: Recommendations based on your health profile
+- ✅ **Open Source**: All components are free and open source
+
+## 🚀 Tech Stack
+
+### Frontend
+- **React 18** - UI framework
+- **Axios** - HTTP client
+- **CSS3** - Styling
+
+### Backend
+- **FastAPI** - Python web framework
+- **EasyOCR** - Open-source OCR engine
+- **Groq API** - Fast LLM inference (free tier)
+- **PostgreSQL** - Database
+- **SQLAlchemy** - ORM
+- **Docker** - Containerization
+
+## ⚡ Quick Start
+
+See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed instructions.
+
+### Option 1: Docker (Recommended)
+
+1. Get free Groq API key from https://console.groq.com
+2. Configure backend:
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Edit .env and add your GROQ_API_KEY
+   docker-compose up --build
+   ```
+3. Start frontend:
+   ```bash
+   cd ..
+   npm install
+   npm start
+   ```
+
+### Option 2: Manual Setup
+
+1. **Backend**:
+   ```bash
+   cd backend
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   pip install -r requirements.txt
+   # Set up PostgreSQL and configure .env
+   cd app
+   python main.py
+   ```
+
+2. **Frontend**:
+   ```bash
+   npm install
+   npm start
+   ```
 
 ## Features
 
 ### 📸 Smart Image Upload
-- Upload photos of food labels via click or drag-and-drop
-- OCR-ready for ingredient extraction (simulated in demo)
+- Upload photos of food labels
+- Real OCR text extraction using EasyOCR
+- Drag-and-drop support
 
 ### 👤 Personalization
-- Dietary restrictions (Vegan, Vegetarian, Gluten-Free, Dairy-Free, Halal, Kosher)
-- Health goals (Weight Management, Heart Health, Blood Sugar Control, etc.)
-- Special considerations (Children, Pregnancy, Senior Health, Athletes)
+- Dietary restrictions (Vegan, Vegetarian, Gluten-Free, etc.)
+- Health goals (Weight Management, Heart Health, etc.)
+- Special considerations (Children, Pregnancy, Athletes)
+- Saved to database for future use
 
-### 🔬 Intelligent Analysis
+### 🔬 AI-Powered Analysis
+- **Real-time OCR**: Extract ingredients from images
+- **LLM Analysis**: Groq's LLaMA models analyze safety
 - **Overall Health Score**: Visual scoring system (0-10)
-- **Concern Detection**: Identifies problematic ingredients with confidence levels
-- **Positive Aspects**: Highlights beneficial ingredients
-- **Uncertainty Communication**: Honest about what we don't know
+- **Concern Detection**: Identifies problematic ingredients
+- **Confidence Levels**: Transparent about certainty
+- **History Tracking**: View past analyses
 
 ### 📊 Multi-Tab Insights
 1. **Overview**: Quick summary with detected ingredients
 2. **Concerns**: Detailed breakdown of problematic ingredients
 3. **Positives**: Beneficial aspects and alternatives
 4. **Uncertainties**: Transparent about incomplete information
+
+## 📚 API Documentation
+
+Once backend is running, visit:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
 ## Installation
 

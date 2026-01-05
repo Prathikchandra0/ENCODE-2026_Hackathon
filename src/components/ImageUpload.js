@@ -9,7 +9,7 @@ const ImageUpload = ({ onImageUpload, uploadedImage }) => {
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        onImageUpload(reader.result);
+        onImageUpload(reader.result, file);
       };
       reader.readAsDataURL(file);
     } else {
@@ -23,7 +23,7 @@ const ImageUpload = ({ onImageUpload, uploadedImage }) => {
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        onImageUpload(reader.result);
+        onImageUpload(reader.result, file);
       };
       reader.readAsDataURL(file);
     }
